@@ -60,4 +60,11 @@ class MythHandlerTest extends ModuleTests\Support\DatabaseTestCase
 
 		$this->assertEquals('dark', $row->username);
 	}
+
+	public function testRemoveDeletes()
+	{
+		$this->handler->remove(2);
+
+		$this->assertNull($this->model->find(2));
+	}
 }
