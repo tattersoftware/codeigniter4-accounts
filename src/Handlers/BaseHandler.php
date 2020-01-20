@@ -1,6 +1,6 @@
-<?php namespace Tatter\Accounts;
+<?php namespace Tatter\Accounts\Handlers;
 
-use Tatter\Accounts\Interfaces\AccountInterface;
+use Tatter\Accounts\Entities\Account;
 
 abstract class BaseHandler
 {
@@ -59,7 +59,7 @@ abstract class BaseHandler
 	 *
 	 * @return Account
 	 */
-	abstract protected function map($data): Account
+	abstract protected function map($data): Account;
 
 	/**
 	 * Return an account by its primary key

@@ -1,4 +1,4 @@
-<?php namespace Tatter\Accounts;
+<?php namespace Tatter\Accounts\Handlers;
 
 use CodeIgniter\Model;
 use Tatter\Accounts\Entities\Account;
