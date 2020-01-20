@@ -8,14 +8,30 @@ class MythHandlerTest extends ModuleTests\Support\DatabaseTestCase
 	public function setUp(): void
 	{
 		parent::setUp();
+
+		$this->handler = new MythHandler();
 	}
 
 	public function testLoadsDefaultModel()
 	{
-		$handler = new MythHandler();
-
-		$model = $this->getPrivateProperty($handler, 'model');
+		$model = $this->getPrivateProperty($this->handler, 'model');
 
 		$this->assertEquals('users', $model->table);
+	}
+
+	public function testCanChangeModel()
+	{
+		$this->handler->setModel(new \ModuleTests\Support\Models\NewTableModel());
+
+		$model = $this->getPrivateProperty($this->handler, 'model');
+
+		$this->assertEquals('foobar', $model->table);
+	}
+
+	public function testGetUnmatchedReturnsNull()
+	{
+		$model = $this->getPrivateProperty($this->handler, 'model');
+
+		$this->assertNull($this->handler->get(12345));
 	}
 }

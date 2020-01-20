@@ -93,7 +93,7 @@ abstract class ModelHandler extends BaseHandler
 	 */
 	public function get($uid): ?Account
 	{
-		if (! $data = $this->model->find($id))
+		if (! $data = $this->model->find($uid))
 		{
 			return null;			
 		}
@@ -116,14 +116,14 @@ abstract class ModelHandler extends BaseHandler
 	 */
 	public function add($data): ?Account
 	{
-		if (! $id = $this->model->insert($data, true))
+		if (! $uid = $this->model->insert($data, true))
 		{
 			$this->errors = $this->model->errors();
 
 			return null;			
 		}
 
-		return $this->get($id);
+		return $this->get($uid);
 	}
 
 	/**
@@ -142,7 +142,7 @@ abstract class ModelHandler extends BaseHandler
 	}
 
 	/**
-	 * Deletes a single account where $id matches the primaryKey
+	 * Deletes a single account where $uid matches the primaryKey
 	 *
 	 * @param mixed $uid  The the account's primary key
 	 *
