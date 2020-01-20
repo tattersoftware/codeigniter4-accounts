@@ -8,13 +8,6 @@
 class Accounts
 {
 	/**
-	 * Error messages from the last call
-	 *
-	 * @var array
-	 */
-	protected $errors = [];
-
-	/**
 	 * Cache for handlers that have already been loaded.
 	 *
 	 * @var array
@@ -29,19 +22,6 @@ class Accounts
 	public function __construct()
 	{
 
-	}
-
-	/**
-	 * Get and clear any error messsages
-	 *
-	 * @return array  Any error messages from the last call
-	 */
-	public function getErrors(): array
-	{
-		$errors       = $this->errors;
-		$this->errors = [];
-
-		return $errors;
 	}
 
 	//--------------------------------------------------------------------

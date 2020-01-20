@@ -19,22 +19,11 @@ abstract class BaseHandler
 	protected $fields = [];
 
 	/**
-	 * Return an account by its primary key
+	 * Error messages from the last call
 	 *
-	 * @param mixed $id  The value of primaryKey to look for
-	 *
-	 * @return Account|null
+	 * @var array
 	 */
-	abstract public function find($id): ?Account;
-
-	/**
-	 * Map source values to their internal version
-	 *
-	 * @param mixed $raw  Raw entity from the source
-	 *
-	 * @return Account
-	 */
-	abstract protected function map($raw): Account;
+	protected $errors = [];
 
 	/**
 	 * Change the primary key used for lookups.
@@ -49,4 +38,63 @@ abstract class BaseHandler
 
 		return $this;
 	}
+
+	/**
+	 * Get and clear any error messsages
+	 *
+	 * @return array  Any error messages from the last call
+	 */
+	public function getErrors(): array
+	{
+		$errors       = $this->errors;
+		$this->errors = [];
+
+		return $errors;
+	}
+
+	/**
+	 * Map source values to their internal version
+	 *
+	 * @param mixed $data  Original result from the source
+	 *
+	 * @return Account
+	 */
+	abstract protected function map($data): Account
+
+	/**
+	 * Return an account by its primary key
+	 *
+	 * @param mixed $uid  The value of primaryKey to look for
+	 *
+	 * @return Account|null
+	 */
+	abstract public function get($uid): ?Account;
+
+	/**
+	 * Create a new account and return it
+	 *
+	 * @param mixed $data  Values to use
+	 *
+	 * @return Account|null
+	 */
+	abstract public function add($data): ?Account;
+
+	/**
+	 * Update an existing account
+	 *
+	 * @param mixed $uid   The value of primaryKey to look for
+	 * @param mixed $data  Values to use
+	 *
+	 * @return bool
+	 */
+	abstract public function update($uid, $data): bool;
+
+	/**
+	 * Deletes a single account where $uid matches the primaryKey
+	 *
+	 * @param mixed $uid  The account's primary key
+	 *
+	 * @return bool
+	 */
+	abstract public function remove($uid): bool;
 }

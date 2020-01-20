@@ -29,6 +29,10 @@ abstract class ModelHandler extends BaseHandler
 		$this->model = $model;
 	}
 
+	//--------------------------------------------------------------------
+	// Utilities
+	//--------------------------------------------------------------------
+
 	/**
 	 * Change the model instance.
 	 *
@@ -50,10 +54,8 @@ abstract class ModelHandler extends BaseHandler
 	 *
 	 * @return Account
 	 */
-	protected function map($data, Account $account): Account
+	protected function map($data): Account
 	{
-		$account = new Account(self::class);
-
 		// Get it to an array
 		if (is_object($data) && ! $data instanceof stdClass)
 		{
@@ -66,6 +68,9 @@ abstract class ModelHandler extends BaseHandler
 			$data = (array) $data;
 		}
 
+		// Create the account entity
+		$account = new Account(self::class, $data[$this->primaryKey]);
+
 		// Map each field
 		foreach ($this->fields as $from => $to)
 		{
@@ -75,14 +80,18 @@ abstract class ModelHandler extends BaseHandler
 		return $account;
 	}
 
+	//--------------------------------------------------------------------
+	// CRUD
+	//--------------------------------------------------------------------
+
 	/**
-	 * Return an account by its ID
+	 * Return an account by its UID
 	 *
-	 * @param mixed $id  The value of primaryKey to look for
+	 * @param mixed $uid  The value of primaryKey to look for
 	 *
 	 * @return Account|null
 	 */
-	public function find($id): ?Account
+	public function get($uid): ?Account
 	{
 		if (! $data = $this->model->find($id))
 		{
@@ -97,3 +106,52 @@ abstract class ModelHandler extends BaseHandler
 
 		return $account;
 	}
+
+	/**
+	 * Create a new account and return it
+	 *
+	 * @param mixed $data  Values to use
+	 *
+	 * @return Account|null
+	 */
+	public function add($data): ?Account
+	{
+		if (! $id = $this->model->insert($data, true))
+		{
+			$this->errors = $this->model->errors();
+
+			return null;			
+		}
+
+		return $this->get($id);
+	}
+
+	/**
+	 * Update an existing account
+	 *
+	 * @param mixed $uid   The value of primaryKey to look for
+	 * @param mixed $data  Values to use
+	 *
+	 * @return bool
+	 */
+	public function update($uid, $data): bool
+	{
+		$result = $this->model->update($uid, $data);
+
+		return (bool) $result;
+	}
+
+	/**
+	 * Deletes a single account where $id matches the primaryKey
+	 *
+	 * @param mixed $uid  The the account's primary key
+	 *
+	 * @return bool
+	 */
+	public function remove($uid): bool
+	{
+		$result = $this->model->delete($uid);
+
+		return (bool) $result;
+	}
+}

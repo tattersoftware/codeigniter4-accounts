@@ -58,6 +58,14 @@ class Account
 	protected $handler;
 
 	/**
+	 * This account's unique identifier
+	 * Corresponds to the handler's primaryKey
+	 *
+	 * @var int|string
+	 */
+	protected $uid;
+
+	/**
 	 * Original data returned from the source
 	 *
 	 * @var mixed
@@ -68,20 +76,32 @@ class Account
 	 * Create a new entity noting the source handler
 	 *
 	 * @param string $handler  Name of the source handler
+	 * @param int|string $uid  This account's unique identifier
 	 */
-	public function __construct(string $handler)
+	public function __construct(string $handler, $uid)
 	{
 		$this->handler = $handler;
+		$this->uid     = $uid;
 	}
 
 	/**
-	 * Sets or returns original set of data
+	 * Returns this account's unique identifier
+	 *
+	 * @return mixed
+	 */
+	public function uid()
+	{
+		return $this->uid;
+	}
+
+	/**
+	 * Sets or returns the original set of data
 	 *
 	 * @param mixed|null $data  Original returned data, or null to fetch
 	 *
 	 * @return mixed
 	 */
-	protected function original($data = null)
+	public function original($data = null)
 	{
 		if ($data !== null)
 		{
