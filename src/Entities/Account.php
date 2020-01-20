@@ -1,4 +1,4 @@
-<?php namespace Tatter\Accounts\Entities\Account;
+<?php namespace Tatter\Accounts\Entities;
 
 /**
  * Class Account

@@ -59,7 +59,7 @@ abstract class ModelHandler extends BaseHandler
 		// Get it to an array
 		if (is_object($data) && ! $data instanceof stdClass)
 		{
-			$data = $this->model::classToArray($data, $this->primaryKey);
+			$data = $this->model::classToArray($data, $this->primaryKey, 'datetime', false);
 		}
 
 		// If it's still a stdClass, go ahead and convert
