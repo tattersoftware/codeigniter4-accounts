@@ -35,14 +35,16 @@ Load the service:
 
 Then access each handler by its name:
 
-	$user = $accounts->myth->find(3);
+	$user = $accounts->myth->get(3);
 
 **Accounts** returns a standardized set of fields, regardless of the endpoint's format. The
-original entity is always available via the `getSource()` method:
+original entity is always available via the `original()` method:
 
-	$permissions = $user->getSource()->getPermissions();
+	$permissions = $user->original()->getPermissions();
+
+Supported methods: `get()`, `add()`, `update()`, `remove()`
 
 ## Extending
 
-Use the provided abstract classes and interfaces to write your own handlers, or check back
+Use the provided abstract `BaseHandler` class to write your own handlers, or check back
 for new implementations as this library grows.

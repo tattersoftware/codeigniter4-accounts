@@ -61,7 +61,7 @@ class Account
 	 * This account's unique identifier
 	 * Corresponds to the handler's primaryKey
 	 *
-	 * @var int|string
+	 * @var int|string|null
 	 */
 	protected $uid;
 
@@ -76,9 +76,9 @@ class Account
 	 * Create a new entity noting the source handler
 	 *
 	 * @param string $handler  Name of the source handler
-	 * @param int|string $uid  This account's unique identifier
+	 * @param int|string $uid  This account's unique identifier; null should indicate an un-created account
 	 */
-	public function __construct(string $handler, $uid)
+	public function __construct(string $handler, $uid = null)
 	{
 		$this->handler = $handler;
 		$this->uid     = $uid;

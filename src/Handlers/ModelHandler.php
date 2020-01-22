@@ -27,14 +27,16 @@ abstract class ModelHandler extends BaseHandler
 	//--------------------------------------------------------------------
 
 	/**
-	 * Generic solution to map $fields from source to internal keys.
+	 * Wrap original source data into an Account based on $fields.
 	 *
 	 * @param mixed $data  Result from the model
 	 *
 	 * @return Account
 	 */
-	protected function map($data): Account
+	protected function wrap($data): Account
 	{
+		$original = $data;
+
 		// Get it to an array
 		if (is_object($data) && ! $data instanceof stdClass)
 		{
@@ -48,15 +50,50 @@ abstract class ModelHandler extends BaseHandler
 		}
 
 		// Create the account entity
-		$account = new Account(self::class, $data[$this->primaryKey]);
+		$account = new Account(self::class, $data[$this->primaryKey] ?? null);
 
 		// Map each field
 		foreach ($this->fields as $from => $to)
 		{
-			$account->$to = $data[$from];
+			if (isset($data[$from]))
+			{
+				$account->$to = $data[$from];
+			}
 		}
 
+		// Inject the model result
+		$account->original($original);
+
 		return $account;
+	}
+
+	/**
+	 * Use $fields to create an array of data from $account that is ready for model insert/update
+	 *
+	 * @param Account $account  Any Account object
+	 *
+	 * @return array  Data formatted for this model to insert/update
+	 */
+	protected function unwrap(Account $account): array
+	{
+		$data = [];
+
+		// Check each field
+		foreach ($this->fields as $to => $from)
+		{
+			// Never include the primary key
+			if ($from == $this->primaryKey)
+			{
+				continue;
+			}
+
+			if (isset($account->$from))
+			{
+				$data[$to] = $account->$from;
+			}
+		}
+
+		return $data;
 	}
 
 	//--------------------------------------------------------------------
@@ -77,24 +114,26 @@ abstract class ModelHandler extends BaseHandler
 			return null;			
 		}
 
-		// Get an Account with mapped values
-		$account = $this->map($data);
-
-		// Inject the model result
-		$account->original($data);
-
-		return $account;
+		// Wrap the result into an Account
+		return $this->wrap($data);
 	}
 
 	/**
 	 * Create a new account and return it
 	 *
-	 * @param mixed $data  Values to use
+	 * @param Account|array $data  Values to use
 	 *
 	 * @return Account|null
 	 */
 	public function add($data): ?Account
 	{
+		// If an Account was given then unwrap it
+		if ($data instanceof Account)
+		{
+			$data = $this->unwrap($data);
+		}
+
+		// Try to insert it
 		if (! $uid = $this->source->insert($data, true))
 		{
 			$this->errors = $this->source->errors();
@@ -102,6 +141,7 @@ abstract class ModelHandler extends BaseHandler
 			return null;			
 		}
 
+		// Return the new entity as an Account
 		return $this->get($uid);
 	}
 
@@ -109,12 +149,18 @@ abstract class ModelHandler extends BaseHandler
 	 * Update an existing account
 	 *
 	 * @param mixed $uid   The value of primaryKey to look for
-	 * @param mixed $data  Values to use
+	 * @param mixed $Account|array  Values to use
 	 *
 	 * @return bool
 	 */
 	public function update($uid, $data): bool
 	{
+		// If an Account was given then unwrap it
+		if ($data instanceof Account)
+		{
+			$data = $this->unwrap($data);
+		}
+
 		$result = $this->source->update($uid, $data);
 
 		return (bool) $result;

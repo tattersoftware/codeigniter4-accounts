@@ -20,6 +20,7 @@ abstract class BaseHandler
 
 	/**
 	 * Internal fields supported by this handler.
+	 * Some handlers use the keys to define the mapping of values, $original => $internal.
 	 *
 	 * @var array
 	 */
@@ -65,7 +66,7 @@ abstract class BaseHandler
 	 *
 	 * @return array  Any error messages from the last call
 	 */
-	public function getErrors(): array
+	public function errors(): array
 	{
 		$errors       = $this->errors;
 		$this->errors = [];
@@ -74,13 +75,22 @@ abstract class BaseHandler
 	}
 
 	/**
-	 * Map source values to their internal version
+	 * Create an Account from source data
 	 *
 	 * @param mixed $data  Original result from the source
 	 *
 	 * @return Account
 	 */
-	abstract protected function map($data): Account;
+	abstract protected function wrap($data): Account;
+
+	/**
+	 * Create usable source data from an Account
+	 *
+	 * @param Account $account
+	 *
+	 * @return array  Data in a handler-specific format (e.g. ready to be used with create)
+	 */
+	abstract protected function unwrap(Account $account): array;
 
 	/**
 	 * Return an account by its primary key
@@ -94,7 +104,7 @@ abstract class BaseHandler
 	/**
 	 * Create a new account and return it
 	 *
-	 * @param mixed $data  Values to use
+	 * @param Account|array|object $data  Values to use
 	 *
 	 * @return Account|null
 	 */
@@ -103,8 +113,8 @@ abstract class BaseHandler
 	/**
 	 * Update an existing account
 	 *
-	 * @param mixed $uid   The value of primaryKey to look for
-	 * @param mixed $data  Values to use
+	 * @param mixed $uid   The value of primaryKey to update
+	 * @param Account|array|object $data  Values to use
 	 *
 	 * @return bool
 	 */

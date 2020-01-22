@@ -37,7 +37,8 @@
 		"mockery/mockery": "^1.0",
 		"fzaninotto/faker": "^1.9@dev",
 		"codeigniter4/codeigniter4": "dev-develop",
-		"myth/auth": "dev-develop"
+		"myth/auth": "dev-develop",
+		"stripe/stripe-php": "^7.14"
 	},
 	"autoload": {
 		"psr-4": {

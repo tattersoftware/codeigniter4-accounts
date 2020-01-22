@@ -1,6 +1,7 @@
 <?php
 
 use Myth\Auth\Models\UserModel;
+use Tatter\Accounts\Entities\Account;
 use Tatter\Accounts\Handlers\MythHandler;
 
 class MythHandlerTest extends ModuleTests\Support\DatabaseTestCase
@@ -61,10 +62,121 @@ class MythHandlerTest extends ModuleTests\Support\DatabaseTestCase
 		$this->assertEquals('dark', $row->username);
 	}
 
+	public function testUpdateWorksWithAccount()
+	{
+		$account = new Account(get_class($this->handler));
+		$account->username = 'sakura';
+
+		$this->handler->update(2, $account);
+
+		$row = $this->model->find(2);
+
+		$this->assertEquals('sakura', $row->username);
+	}
+
+	public function testAddReturnsAccount()
+	{
+		$data = [
+			'email'         => 'roland@darktower.com',
+			'username'      => 'roland',
+			'password_hash' => 'press4ward',
+		];
+
+		$result = $this->handler->add($data);
+
+		$this->assertInstanceOf('Tatter\Accounts\Entities\Account', $result);
+	}
+
+	public function testAddHasOriginal()
+	{
+		$data = [
+			'email'         => 'roland@darktower.com',
+			'username'      => 'roland',
+			'password_hash' => 'press4ward',
+		];
+
+		$result = $this->handler->add($data);
+
+		$row = $this->model->find($result->id);
+
+		$this->assertEquals($row, $result->original());
+	}
+
 	public function testRemoveDeletes()
 	{
 		$this->handler->remove(2);
 
 		$this->assertNull($this->model->find(2));
+	}
+
+	public function testWrapCreatesAccount()
+	{
+		$method = $this->getPrivateMethodInvoker($this->handler, 'wrap');
+
+		$data = [
+			'username' => 'foobar',
+			'active'   => 1,
+		];
+
+		$result = $method($data);
+
+		$this->assertInstanceOf('Tatter\Accounts\Entities\Account', $result);
+	}
+
+	public function testWrapStandardizesFields()
+	{
+		$method = $this->getPrivateMethodInvoker($this->handler, 'wrap');
+
+		$data = [
+			'username' => 'foobar',
+			'active'   => 1,
+		];
+
+		$result = $method($data);
+
+		$this->assertEquals(1, $result->valid);
+	}
+
+	public function testWrapKeepsOriginal()
+	{
+		$method = $this->getPrivateMethodInvoker($this->handler, 'wrap');
+
+		$data = [
+			'username' => 'foobar',
+			'active'   => 1,
+		];
+
+		$result = $method($data);
+
+		$this->assertEquals($data, $result->original());
+	}
+
+	public function testUnwrapReturnsArray()
+	{
+		$method = $this->getPrivateMethodInvoker($this->handler, 'unwrap');
+
+		$account = new Account(get_class($this->handler));
+		$account->email = 'janus@narnia.net';
+
+		$result = $method($account);
+
+		$this->assertIsArray($result);
+	}
+
+	public function testUnwrapReformatsData()
+	{
+		$method = $this->getPrivateMethodInvoker($this->handler, 'unwrap');
+
+		$account = new Account(get_class($this->handler));
+		$account->email = 'janus@narnia.net';
+		$account->valid = true;
+
+		$expected = [
+			'email'  => 'janus@narnia.net',
+			'active' => true,
+		];
+		$result = $method($account);
+
+		$this->assertEquals($expected, $result);
 	}
 }
