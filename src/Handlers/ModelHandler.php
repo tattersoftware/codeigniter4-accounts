@@ -13,39 +13,18 @@ abstract class ModelHandler extends BaseHandler
 	protected $primaryKey = 'id';
 
 	/**
-	 * The model to use.
-	 *
-	 * @var Model
-	 */
-	protected $model;
-
-	/**
-	 * Load or store the model
+	 * Load or store the model as this handler's source
 	 *
 	 * @param Model $model  Instance of the model
 	 */
 	public function __construct(Model $model)
 	{
-		$this->model = $model;
+		$this->source = $model;
 	}
 
 	//--------------------------------------------------------------------
 	// Utilities
 	//--------------------------------------------------------------------
-
-	/**
-	 * Change the model instance.
-	 *
-	 * @param Model $model  Instance of the model
-	 *
-	 * @return $this
-	 */
-	public function setModel(Model $model): self
-	{
-		$this->model = $model;
-
-		return $this;
-	}
 
 	/**
 	 * Generic solution to map $fields from source to internal keys.
@@ -59,7 +38,7 @@ abstract class ModelHandler extends BaseHandler
 		// Get it to an array
 		if (is_object($data) && ! $data instanceof stdClass)
 		{
-			$data = $this->model::classToArray($data, $this->primaryKey, 'datetime', false);
+			$data = $this->source::classToArray($data, $this->primaryKey, 'datetime', false);
 		}
 
 		// If it's still a stdClass, go ahead and convert
@@ -93,7 +72,7 @@ abstract class ModelHandler extends BaseHandler
 	 */
 	public function get($uid): ?Account
 	{
-		if (! $data = $this->model->find($uid))
+		if (! $data = $this->source->find($uid))
 		{
 			return null;			
 		}
@@ -116,9 +95,9 @@ abstract class ModelHandler extends BaseHandler
 	 */
 	public function add($data): ?Account
 	{
-		if (! $uid = $this->model->insert($data, true))
+		if (! $uid = $this->source->insert($data, true))
 		{
-			$this->errors = $this->model->errors();
+			$this->errors = $this->source->errors();
 
 			return null;			
 		}
@@ -136,7 +115,7 @@ abstract class ModelHandler extends BaseHandler
 	 */
 	public function update($uid, $data): bool
 	{
-		$result = $this->model->update($uid, $data);
+		$result = $this->source->update($uid, $data);
 
 		return (bool) $result;
 	}
@@ -150,7 +129,7 @@ abstract class ModelHandler extends BaseHandler
 	 */
 	public function remove($uid): bool
 	{
-		$result = $this->model->delete($uid);
+		$result = $this->source->delete($uid);
 
 		return (bool) $result;
 	}

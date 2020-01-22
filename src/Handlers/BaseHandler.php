@@ -5,6 +5,13 @@ use Tatter\Accounts\Entities\Account;
 abstract class BaseHandler
 {
 	/**
+	 * Instance of the class to use.
+	 *
+	 * @var mixed
+	 */
+	protected $source;
+
+	/**
 	 * Target field to use as the unique identifier.
 	 *
 	 * @var string
@@ -24,6 +31,20 @@ abstract class BaseHandler
 	 * @var array
 	 */
 	protected $errors = [];
+
+	/**
+	 * Change the source instance.
+	 *
+	 * @param mixed $source  Instance of the source class
+	 *
+	 * @return $this
+	 */
+	public function setSource($source): self
+	{
+		$this->source = $source;
+
+		return $this;
+	}
 
 	/**
 	 * Change the primary key used for lookups.

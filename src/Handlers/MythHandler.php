@@ -31,6 +31,6 @@ class MythHandler extends ModelHandler
 	 */
 	public function __construct(Model $model = null)
 	{
-		$this->model = $model ?? new UserModel();
+		$this->source = $model ?? new UserModel();
 	}
 }
