@@ -6,20 +6,14 @@ use Tatter\Accounts\Entities\Account;
 abstract class ModelHandler extends BaseHandler
 {
 	/**
-	 * Target field to use as the unique identifier.
-	 *
-	 * @var string
-	 */
-	protected $primaryKey = 'id';
-
-	/**
 	 * Load or store the model as this handler's source
 	 *
 	 * @param Model $model  Instance of the model
 	 */
 	public function __construct(Model $model)
 	{
-		$this->source = $model;
+		$this->source     = $model;
+		$this->primaryKey = $model->primaryKey;
 	}
 
 	//--------------------------------------------------------------------
@@ -65,35 +59,6 @@ abstract class ModelHandler extends BaseHandler
 		$account->original($original);
 
 		return $account;
-	}
-
-	/**
-	 * Use $fields to create an array of data from $account that is ready for model insert/update
-	 *
-	 * @param Account $account  Any Account object
-	 *
-	 * @return array  Data formatted for this model to insert/update
-	 */
-	protected function unwrap(Account $account): array
-	{
-		$data = [];
-
-		// Check each field
-		foreach ($this->fields as $to => $from)
-		{
-			// Never include the primary key
-			if ($from == $this->primaryKey)
-			{
-				continue;
-			}
-
-			if (isset($account->$from))
-			{
-				$data[$to] = $account->$from;
-			}
-		}
-
-		return $data;
 	}
 
 	//--------------------------------------------------------------------

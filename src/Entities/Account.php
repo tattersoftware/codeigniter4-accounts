@@ -26,6 +26,13 @@ class Account
 	public $name;
 
 	/**
+	 * Username
+	 *
+	 * @var string|null
+	 */
+	public $username;
+
+	/**
 	 * Valid email address
 	 *
 	 * @var string|null
@@ -33,11 +40,11 @@ class Account
 	public $email;
 
 	/**
-	 * Username
+	 * Valid phone number
 	 *
 	 * @var string|null
 	 */
-	public $username;
+	public $phone;
 
 	/**
 	 * Whether the handler considers this account valid & usable

@@ -8,13 +8,6 @@ use Tatter\Accounts\Entities\Account;
 class MythHandler extends ModelHandler
 {
 	/**
-	 * Target field to use as the unique identifier.
-	 *
-	 * @var string
-	 */
-	protected $primaryKey = 'id';
-
-	/**
 	 * Internal fields supported by this handler.
 	 *
 	 * @var array
@@ -67,7 +60,7 @@ class MythHandler extends ModelHandler
 	 * Runs arrays through the entity to apply setters.
 	 *
 	 * @param mixed $uid   The value of primaryKey to look for
-	 * @param mixed $Account|array  Values to use
+	 * @param mixed Account|array  Values to use
 	 *
 	 * @return bool
 	 */

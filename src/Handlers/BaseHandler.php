@@ -20,7 +20,7 @@ abstract class BaseHandler
 
 	/**
 	 * Internal fields supported by this handler.
-	 * Some handlers use the keys to define the mapping of values, $original => $internal.
+	 * Defines the mapping of values, $original => $internal.
 	 *
 	 * @var array
 	 */
@@ -75,6 +75,35 @@ abstract class BaseHandler
 	}
 
 	/**
+	 * Use $fields to create an array of data from $account that is ready for add/update
+	 *
+	 * @param Account $account  Any Account object
+	 *
+	 * @return array  Data in a handler-specific format, e.g. ready to be used with add()
+	 */
+	protected function unwrap(Account $account): array
+	{
+		$data = [];
+
+		// Check each field
+		foreach ($this->fields as $to => $from)
+		{
+			// Never include the primary key
+			if ($from == $this->primaryKey)
+			{
+				continue;
+			}
+
+			if (isset($account->$from))
+			{
+				$data[$to] = $account->$from;
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Create an Account from source data
 	 *
 	 * @param mixed $data  Original result from the source
@@ -82,15 +111,6 @@ abstract class BaseHandler
 	 * @return Account
 	 */
 	abstract protected function wrap($data): Account;
-
-	/**
-	 * Create usable source data from an Account
-	 *
-	 * @param Account $account
-	 *
-	 * @return array  Data in a handler-specific format (e.g. ready to be used with create)
-	 */
-	abstract protected function unwrap(Account $account): array;
 
 	/**
 	 * Return an account by its primary key
