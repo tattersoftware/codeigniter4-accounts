@@ -5,130 +5,86 @@ use Stripe\Stripe;
 use Tatter\Accounts\Entities\Account;
 use Tatter\Accounts\Handlers\StripeHandler;
 
-class StripeHandlerTest extends ModuleTests\Support\DatabaseTestCase
+class StripeHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 {
+	use \Tatter\Accounts\Test\StripeTestTrait;
+
 	public function setUp(): void
 	{
 		parent::setUp();
+		
+		$this->accountsSetUp();
 
 		$this->handler = new StripeHandler();
 	}
 
-	public function testGetUnmatchedReturnsNull()
+	public function tearDown(): void
 	{
-		$this->assertNull($this->handler->get(12345));
+		parent::tearDown();
+		
+		$this->accountsTearDown();
 	}
 
 	public function testAddReturnsAccount()
 	{
 		$data = [
-			'name'  => 'Roland Deschain',
-			'email' => 'roland@darktower.com',
+			'name'  => self::$faker->name,
+			'email' => self::$faker->email,
 		];
 
 		$result = $this->handler->add($data);
 
 		$this->assertInstanceOf('Tatter\Accounts\Entities\Account', $result);
+
+		// Clean up
+		$result->original()->delete();
 	}
-/*
+
+	public function testGetUnmatchedReturnsNull()
+	{
+		// Have to turn off debug mode to ignore the exception
+		$this->handler->debug = false;
+
+		$this->assertNull($this->handler->get(12345));
+	}
+
 	public function testGetReturnsCorrectValues()
 	{
-		$account = $this->handler->get(1);
+		$account = $this->createStripeAccount();
 
-		$this->assertEquals(1, $account->id);
-		$this->assertEquals('yamira@noted.com', $account->email);
-		$this->assertEquals('light', $account->username);
-	}
+		$result = $this->handler->get($account->uid());
 
-	public function testGetConvertsActive()
-	{
-		$this->model->update(1, ['active' => 0]);
-
-		$account = $this->handler->get(1);
-
-		$this->assertFalse((bool) $account->valid);
+		$this->assertEquals($account->email, $result->email);
 	}
 
 	public function testUpdateChangesValues()
 	{
-		$this->handler->update(1, ['username' => 'dark']);
+		$original = $this->createStripeAccount();
+		
+		$email = self::$faker->email;
 
-		$row = $this->model->find(1);
+		$result = $this->handler->update($original->uid(), ['email' => $email]);
+		$this->assertTrue($result);
+		
+		$account = $this->handler->get($original->uid());
 
-		$this->assertEquals('dark', $row->username);
-	}
-
-	public function testUpdateWorksWithAccount()
-	{
-		$account = new Account(get_class($this->handler));
-		$account->username = 'sakura';
-
-		$this->handler->update(2, $account);
-
-		$row = $this->model->find(2);
-
-		$this->assertEquals('sakura', $row->username);
-	}
-
-	public function testAddHasOriginal()
-	{
-		$data = [
-			'email'         => 'roland@darktower.com',
-			'username'      => 'roland',
-			'password_hash' => 'press4ward',
-		];
-
-		$result = $this->handler->add($data);
-
-		$row = $this->model->find($result->id);
-
-		$this->assertEquals($row, $result->original());
+		$this->assertEquals($email, $account->email);
 	}
 
 	public function testRemoveDeletes()
 	{
-		$this->handler->remove(2);
+		$account = $this->createStripeAccount();
 
-		$this->assertNull($this->model->find(2));
-	}
-*/
-	public function testWrapCreatesAccount()
-	{
-		$method = $this->getPrivateMethodInvoker($this->handler, 'wrap');
+		$result = $this->handler->remove($account->uid());
+		$this->assertTrue($result);
 
-		$data = [
-			'name'  => 'Captain Snuffles',
-			'email' => 'snuffles@thehighseas.com',
-		];
+		// Have to turn off debug mode to ignore the exception
+		$this->handler->debug = false;
+		$result = $this->handler->get($account->uid());
 
-		$result = $method($data);
+		$this->assertTrue($result->original()->deleted);
 
-		$this->assertInstanceOf('Tatter\Accounts\Entities\Account', $result);
-	}
-
-	public function testWrapKeepsOriginal()
-	{
-		$method = $this->getPrivateMethodInvoker($this->handler, 'wrap');
-
-		$data = [
-			'name'  => 'Captain Snuffles',
-			'email' => 'snuffles@thehighseas.com',
-		];
-
-		$result = $method($data);
-
-		$this->assertEquals($data, $result->original());
-	}
-
-	public function testUnwrapReturnsArray()
-	{
-		$method = $this->getPrivateMethodInvoker($this->handler, 'unwrap');
-
-		$account = new Account(get_class($this->handler));
-		$account->email = 'janus@narnia.net';
-
-		$result = $method($account);
-
-		$this->assertIsArray($result);
+		// Since the account is gone, remove it from the cache
+		$this->removeCache = [];
 	}
 }

@@ -29,11 +29,18 @@ class StripeHandler extends BaseHandler
 	 * @var array
 	 */
 	protected $fields = [
-		'id'       => 'id',
-		'name'     => 'name',
-		'email'    => 'email',
-		'phone'    => 'phone',
+		'id'    => 'id',
+		'name'  => 'name',
+		'email' => 'email',
+		'phone' => 'phone',
 	];
+
+	/**
+	 * Toggle for debug mode - whether exceptions throw or not
+	 *
+	 * @var bool
+	 */
+	public $debug;
 
 	/**
 	 * Initiate the Stripe API with the given secret, defaults to the environment key.
@@ -46,6 +53,8 @@ class StripeHandler extends BaseHandler
 		{
 			$secret = env('stripe.secret');
 		}
+
+		$this->debug = CI_DEBUG;
 
 		// Initialize the API
 		Stripe::setApiKey($secret);
@@ -93,15 +102,24 @@ class StripeHandler extends BaseHandler
 	 */
 	protected function tryStripeMethod(callable $callback, ...$params)
 	{
+		// If debug mode is enabled then make the call directly
+		if ($this->debug)
+		{
+			return $callback(...$params);
+		}
+
+		// Otherwise intercept errors
 		try
 		{
-			$result = $callback($params);
+			$result = $callback(...$params);
 		}
 		catch (\Exception $e)
 		{
 			 $this->errors[] = $e->getMessage();
 			 return null;
 		}
+
+		return $result;
 	}
 
 	//--------------------------------------------------------------------
