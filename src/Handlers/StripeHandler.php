@@ -4,7 +4,6 @@ use Stripe\Customer;
 use Stripe\Stripe;
 use Tatter\Accounts\Entities\Account;
 
-
 /**
  * Class StripeHandler
  *
