@@ -117,4 +117,38 @@ class Account
 
 		return $this->original;
 	}
+
+	/**
+	 * Split a full name into $num segments
+	 * Extra names go into the first segment
+	 *
+	 * @param int $num  Number of segments, e.g. 2 = [first,last]
+	 *
+	 * @return ?array $names
+	 */
+	public function names(int $num = 2): ?array
+	{
+		if ($this->name === null)
+		{
+			return null;
+		}
+
+		$names  = explode(' ', $this->name);
+		$return = [];
+		
+		for ($i = 1; $i < $num; $i++)
+		{
+			if (! empty($names))
+			{
+				$return[] = array_pop($names);
+			}
+		}
+
+		if (! empty($names))
+		{
+			$return[] = implode(' ', $names);
+		}
+		
+		return array_reverse($return);
+	}
 }
