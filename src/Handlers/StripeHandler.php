@@ -112,7 +112,7 @@ class StripeHandler extends BaseHandler
 		{
 			$result = $callback(...$params);
 		}
-		catch (\Exception $e)
+		catch (\Throwable $e)
 		{
 			 $this->errors[] = $e->getMessage();
 			 return null;

@@ -12,7 +12,7 @@ abstract class BaseHandler
 	protected $source;
 
 	/**
-	 * Target field to use as the unique identifier.
+	 * Source field to use as the unique identifier.
 	 *
 	 * @var string
 	 */
