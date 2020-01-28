@@ -7,7 +7,7 @@ use Tatter\Accounts\Handlers\StripeHandler;
 
 class StripeHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 {
-	use \Tatter\Accounts\Test\StripeTestTrait;
+	use \Tatter\Accounts\Test\AccountsTestTrait;
 
 	public function setUp(): void
 	{
@@ -50,7 +50,7 @@ class StripeHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 
 	public function testGetReturnsCorrectValues()
 	{
-		$account = $this->createStripeAccount();
+		$account = $this->createAccount('stripe');
 
 		$result = $this->handler->get($account->uid());
 
@@ -59,7 +59,7 @@ class StripeHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 
 	public function testUpdateChangesValues()
 	{
-		$original = $this->createStripeAccount();
+		$original = $this->createAccount('stripe');
 		
 		$email = self::$faker->email;
 
@@ -73,7 +73,7 @@ class StripeHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 
 	public function testRemoveDeletes()
 	{
-		$account = $this->createStripeAccount();
+		$account = $this->createAccount('stripe');
 
 		$result = $this->handler->remove($account->uid());
 		$this->assertTrue($result);
@@ -85,6 +85,6 @@ class StripeHandlerTest extends \CodeIgniter\Test\CIUnitTestCase
 		$this->assertTrue($result->original()->deleted);
 
 		// Since the account is gone, remove it from the cache
-		$this->removeCache = [];
+		$this->accountsCache = [];
 	}
 }

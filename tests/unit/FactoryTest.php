@@ -16,7 +16,7 @@ class FactoryTest extends \CodeIgniter\Test\CIUnitTestCase
 	{
 		$handler = $this->accounts->myth;
 
-		$this->assertInstanceOf('Tatter\Accounts\Handlers\BaseHandler', $handler);
+		$this->assertInstanceOf('Tatter\Accounts\Handlers\MythHandler', $handler);
 	}
 
 	public function testCanLoadAnyNamespace()

@@ -2,8 +2,21 @@
 
 use Tatter\Accounts\Entities\Account;
 
+/**
+ * Class AccountsTestTrait
+ *
+ * A set of methods to be used for unit test cases to
+ * assist with generating, creating, and removing accounts.
+ */
 trait AccountsTestTrait
 {
+	/**
+	 * Accounts factory for managing handler instances.
+	 *
+	 * @var Tatter\Accounts\Accounts
+	 */
+	protected static $accounts;
+
 	/**
 	 * Faker instance for generating content.
 	 *
@@ -12,35 +25,56 @@ trait AccountsTestTrait
 	protected static $faker;
 
 	/**
-	 * Cache of objects to be removed during tearDown.
-	 * Names correspond to the method "removeName()"
+	 * Cache of accounts to be removed during tearDown.
 	 *
-	 * @var array of [name, ID]
+	 * @var array of [handler, ID]
 	 */
-	protected $removeCache = [];
+	protected $accountsCache = [];
 
     /**
      * Initialize Faker and make sure the remove cache is clean
      */
 	protected function accountsSetUp(): void
 	{
+		// Load the Accounts factory if it isn't already
+		if (self::$accounts == null)
+		{
+			// Use the service in case it has been mocked
+			self::$accounts = \Config\Services::accounts();
+		}
+
 		// Load Faker if it isn't already
 		if (self::$faker == null)
 		{
 			self::$faker = \Faker\Factory::create();
 		}
 
-		$this->removeCache = [];
+		// Make sure the cache is clean
+		$this->accountsCache = [];
 	}
 
+    /**
+     * Remove cached items added during testing
+     */
 	protected function accountsTearDown(): void
 	{
 		// Remove any test items in the cache
-		foreach ($this->removeCache as $row)
+		while ($row = array_pop($this->accountsCache))
 		{
-			$method = 'remove' . $row[0];
-			$this->$method($row[1]);
+			$this->removeAccount($row[0], $row[1]);
 		}
+	}
+
+	/**
+	 * Generates a random alpha-numeric UID.
+	 *
+	 * @param int $length
+	 *
+	 * @return string
+	 */
+	protected function generateUid(int $length = 29): string
+	{
+		return self::$faker->format('regexify', ['[a-zA-Z0-9]{' . $length . '}']);
 	}
 
 	/**
@@ -67,14 +101,42 @@ trait AccountsTestTrait
 	}
 
 	/**
-	 * Generates a random alpha-numeric UID.
+	 * Creates an Account on-the-fly.
 	 *
-	 * @param int $length
+	 * @param string $handler  Handler name to request of the factory
+	 * @param array  $data     Array of data to override the defaults
 	 *
-	 * @return string
+	 * @return $this
 	 */
-	protected function generateUid(int $length = 29): string
+	protected function createAccount(string $handler, array $data = [])
 	{
-		return self::$faker->format('regexify', ['[a-zA-Z0-9]{' . $length . '}']);
+		$defaults = $this->generateAccount();
+
+		foreach ($data as $field => $value)
+		{
+			$defaults->$field = $value;
+		}
+
+		$handler = self::$accounts->$handler;
+		$account = $this->handler->add($defaults);
+
+		$this->removeCache[] = [$handler, $account->uid()];
+
+		return $account;
+	}
+
+	/**
+	 * Removes an Account.
+	 *
+	 * @param string $handler  Handler name to request of the factory
+	 * @param mixed $uid       The ID of the account to remove
+	 *
+	 * @return bool
+	 */
+	protected function removeAccount(string $handler, $uid): bool
+	{
+		$handler = self::$accounts->$handler;
+
+		return $this->handler->remove($uid);
 	}
 }
