@@ -103,12 +103,12 @@ trait AccountsTestTrait
 	/**
 	 * Creates an Account on-the-fly.
 	 *
-	 * @param string $handler  Handler name to request of the factory
-	 * @param array  $data     Array of data to override the defaults
+	 * @param string $name  Name of the handler to request of the factory
+	 * @param array  $data  Array of data to override the defaults
 	 *
 	 * @return $this
 	 */
-	protected function createAccount(string $handler, array $data = [])
+	protected function createAccount(string $name, array $data = [])
 	{
 		$defaults = $this->generateAccount();
 
@@ -117,10 +117,10 @@ trait AccountsTestTrait
 			$defaults->$field = $value;
 		}
 
-		$handler = self::$accounts->$handler;
-		$account = $this->handler->add($defaults);
+		$handler = self::$accounts->$name;
+		$account = $handler->add($defaults);
 
-		$this->removeCache[] = [$handler, $account->uid()];
+		$this->accountsCache[] = [$name, $account->uid()];
 
 		return $account;
 	}
@@ -128,15 +128,15 @@ trait AccountsTestTrait
 	/**
 	 * Removes an Account.
 	 *
-	 * @param string $handler  Handler name to request of the factory
-	 * @param mixed $uid       The ID of the account to remove
+	 * @param string $name  Name of the handler to request of the factory
+	 * @param mixed $uid    The ID of the account to remove
 	 *
 	 * @return bool
 	 */
-	protected function removeAccount(string $handler, $uid): bool
+	protected function removeAccount(string $name, $uid): bool
 	{
-		$handler = self::$accounts->$handler;
+		$handler = self::$accounts->$name;
 
-		return $this->handler->remove($uid);
+		return $handler->remove($uid);
 	}
 }
