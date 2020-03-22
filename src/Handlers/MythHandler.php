@@ -39,18 +39,20 @@ class MythHandler extends ModelHandler
 	 */
 	public function add($data): ?Account
 	{
-		// If it is an array then do some prep
-		if (is_array($data))
+		// If an Account was given then unwrap it
+		if ($data instanceof Account)
 		{
-			// If no password was provided then generate a random one so the account is usable
-			if (! isset($data['password']))
-			{
-				$data['password'] = bin2hex(random_bytes(16));
-			}
-
-			// Run it through the entity to apply defaults, casts, and setters
-			$data = (new User($data))->toRawArray();
+			$data = $this->unwrap($data);
 		}
+
+		// If no password was provided then generate a random one so the account is usable
+		if (! isset($data['password']))
+		{
+			$data['password'] = bin2hex(random_bytes(16));
+		}
+
+		// Run it through the entity to apply defaults, casts, and setters
+		$data = (new User($data))->toRawArray();
 
 		return parent::add($data);
 	}
