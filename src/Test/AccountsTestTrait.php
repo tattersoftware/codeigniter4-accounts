@@ -80,7 +80,7 @@ trait AccountsTestTrait
 	/**
 	 * Generates an Account with random data.
 	 *
-	 * @return array
+	 * @return Account
 	 */
 	protected function generateAccount(): Account
 	{
@@ -106,9 +106,9 @@ trait AccountsTestTrait
 	 * @param string $name  Name of the handler to request of the factory
 	 * @param array  $data  Array of data to override the defaults
 	 *
-	 * @return $this
+	 * @return Account
 	 */
-	protected function createAccount(string $name, array $data = [])
+	protected function createAccount(string $name, array $data = []): Account
 	{
 		$defaults = $this->generateAccount();
 
