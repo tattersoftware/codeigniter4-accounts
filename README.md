@@ -1,3 +1,6 @@
+# DEPRECATED
+This module is deprecated and will be removed in the future. Please do not use it.
+
 # Tatter\Accounts
 Multi-service account management for CodeIgniter 4
 
